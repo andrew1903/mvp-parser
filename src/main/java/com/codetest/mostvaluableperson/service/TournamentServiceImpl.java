@@ -1,51 +1,69 @@
 package com.codetest.mostvaluableperson.service;
 
+import com.codetest.mostvaluableperson.exception.InternalServerException;
+import com.codetest.mostvaluableperson.exception.ParseException;
 import com.codetest.mostvaluableperson.model.Player;
-import com.codetest.mostvaluableperson.parser.BasketballParser;
-import com.codetest.mostvaluableperson.parser.HandballParser;
 import com.codetest.mostvaluableperson.parser.Parser;
-import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class TournamentServiceImpl implements TournamentService {
 
-    private final Map<String, Parser<?>> parsers = Map.of(
-            "HANDBALL", new HandballParser(),
-            "BASKETBALL", new BasketballParser()
-    );
+    private final Map<String, Parser<?>> parsers;
 
-    @Override
-    public List<Map<String, Object>> parse(MultipartFile[] files) {
-        return Arrays.stream(files).map(this::parse).toList();
+    public TournamentServiceImpl(ApplicationContext context) {
+        parsers = context.getBeansOfType(Parser.class).values().stream()
+                .collect(HashMap::new, (map, parser) -> map.put(parser.getName().toUpperCase(), parser), (map1, map2) -> {});
     }
 
     @Override
-    public Map<String, Object> parse(MultipartFile file) {
+    public Map<String, Player> parse(MultipartFile[] files) {
+        return Arrays.stream(files)
+                .flatMap(file -> parse(file).entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
 
-        var players = new ArrayList<Player<?>>();
-        try (var reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+    @Override
+    public Map<String, Player> parse(MultipartFile file) {
+        try(var reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            var players = new ArrayList<Player>();
+
             var line = reader.readLine();
             var parser = parsers.get(line.toUpperCase());
 
-            while ((line = reader.readLine()) != null) {
-                var matcher = parser.getPattern().matcher(line);
-                if (!matcher.matches())
-                    throw new RuntimeException();
-                var player = parser.parse(matcher);
-                players.add(player);
+            if (parser == null) {
+                throw new InternalServerException("Parser for " + line + " not found");
             }
 
-            return players.stream().sorted().findFirst().orElseThrow().toMap();
+            var pattern = parser.getPattern();
+
+            while ((line = reader.readLine()) != null) {
+                var matcher = pattern.matcher(line);
+
+                if (!matcher.matches()) {
+                    throw new ParseException("Line " + line + " does not match pattern " + pattern.pattern());
+                }
+
+                players.add(parser.parse(matcher));
+            }
+
+            return players.stream().max(Player::compareTo)
+                    .map(player -> Map.of(parser.getName(), player))
+                    .orElseThrow(() -> new InternalServerException("No players found in " + file.getOriginalFilename()));
         } catch (IOException ex) {
-            throw new RuntimeException();
+            throw new InternalServerException("Error reading file " + file.getOriginalFilename(), ex);
         }
     }
+
 }

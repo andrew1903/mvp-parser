@@ -1,8 +1,16 @@
 package com.codetest.mostvaluableperson.model;
 
-import java.util.Map;
+public interface Player extends Comparable<Player> {
+    /**
+     * @return Player's score
+     */
+    int getScore();
 
-public interface Player<T extends Player<T>> extends Comparable<T> {
-    Map<String, Object> toMap();
-    Integer getScore();
+    default int compareTo(Player o) {
+        if (!getClass().equals(o.getClass())) {
+            throw new UnsupportedOperationException("Cannot compare players of different games");
+        }
+
+        return Integer.compare(getScore(), o.getScore());
+    }
 }

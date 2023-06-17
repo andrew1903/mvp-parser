@@ -1,11 +1,11 @@
 package com.codetest.mostvaluableperson.model;
 
 import lombok.Builder;
+import lombok.Getter;
 
-import java.util.Map;
-
+@Getter
 @Builder
-public class HandballPlayer implements Player<HandballPlayer> {
+public class HandballPlayer implements Player {
     private String name;
     private String nickname;
     private Integer number;
@@ -14,24 +14,7 @@ public class HandballPlayer implements Player<HandballPlayer> {
     private Integer goalsReceived;
 
     @Override
-    public Integer getScore() {
+    public int getScore() {
         return 2 * goalsMade - goalsReceived;
-    }
-
-    @Override
-    public Map<String, Object> toMap() {
-        return Map.of(
-                "name", name,
-                "nickname", nickname,
-                "number", number,
-                "team", team,
-                "goalsMade", goalsMade,
-                "goalsReceived", goalsReceived
-        );
-    }
-
-    @Override
-    public int compareTo(HandballPlayer o) {
-        return Integer.compare(getScore(), o.getScore());
     }
 }

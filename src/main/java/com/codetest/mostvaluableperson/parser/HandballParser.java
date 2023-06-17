@@ -1,19 +1,13 @@
 package com.codetest.mostvaluableperson.parser;
 
 import com.codetest.mostvaluableperson.model.HandballPlayer;
-import com.codetest.mostvaluableperson.model.Player;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class HandballParser implements Parser<HandballPlayer> {
-
     @Override
     public HandballPlayer parse(Matcher matcher) {
         return HandballPlayer.builder()
@@ -29,5 +23,10 @@ public class HandballParser implements Parser<HandballPlayer> {
     @Override
     public Pattern getPattern() {
         return Pattern.compile("^([^;]+);([^;]+);(\\d+);([^;]+);(\\d+);(\\d+)");
+    }
+
+    @Override
+    public String getName() {
+        return "HANDBALL";
     }
 }
