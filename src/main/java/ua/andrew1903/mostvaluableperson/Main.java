@@ -1,4 +1,4 @@
-package com.codetest.mostvaluableperson;
+package ua.andrew1903.mostvaluableperson;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

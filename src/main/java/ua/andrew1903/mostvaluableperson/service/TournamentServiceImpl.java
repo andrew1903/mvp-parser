@@ -1,9 +1,9 @@
-package com.codetest.mostvaluableperson.service;
+package ua.andrew1903.mostvaluableperson.service;
 
-import com.codetest.mostvaluableperson.exception.InternalServerException;
-import com.codetest.mostvaluableperson.exception.ParseException;
-import com.codetest.mostvaluableperson.model.Player;
-import com.codetest.mostvaluableperson.parser.Parser;
+import ua.andrew1903.mostvaluableperson.exception.InternalServerException;
+import ua.andrew1903.mostvaluableperson.exception.ParseException;
+import ua.andrew1903.mostvaluableperson.model.Player;
+import ua.andrew1903.mostvaluableperson.parser.Parser;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

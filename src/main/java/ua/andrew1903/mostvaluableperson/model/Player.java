@@ -1,4 +1,4 @@
-package com.codetest.mostvaluableperson.model;
+package ua.andrew1903.mostvaluableperson.model;
 
 public interface Player extends Comparable<Player> {
     /**

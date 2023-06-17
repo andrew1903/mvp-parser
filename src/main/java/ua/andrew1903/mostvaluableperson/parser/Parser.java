@@ -1,6 +1,6 @@
-package com.codetest.mostvaluableperson.parser;
+package ua.andrew1903.mostvaluableperson.parser;
 
-import com.codetest.mostvaluableperson.model.Player;
+import ua.andrew1903.mostvaluableperson.model.Player;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

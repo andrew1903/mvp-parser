@@ -1,6 +1,6 @@
-package com.codetest.mostvaluableperson.service;
+package ua.andrew1903.mostvaluableperson.service;
 
-import com.codetest.mostvaluableperson.model.Player;
+import ua.andrew1903.mostvaluableperson.model.Player;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;

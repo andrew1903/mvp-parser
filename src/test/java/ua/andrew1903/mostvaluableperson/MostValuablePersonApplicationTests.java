@@ -1,4 +1,4 @@
-package com.codetest.mostvaluableperson;
+package ua.andrew1903.mostvaluableperson;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

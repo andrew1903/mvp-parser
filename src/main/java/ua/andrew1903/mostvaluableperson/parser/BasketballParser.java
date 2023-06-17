@@ -1,6 +1,6 @@
-package com.codetest.mostvaluableperson.parser;
+package ua.andrew1903.mostvaluableperson.parser;
 
-import com.codetest.mostvaluableperson.model.BasketballPlayer;
+import ua.andrew1903.mostvaluableperson.model.BasketballPlayer;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;

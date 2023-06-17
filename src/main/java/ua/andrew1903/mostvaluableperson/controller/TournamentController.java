@@ -1,7 +1,7 @@
-package com.codetest.mostvaluableperson.controller;
+package ua.andrew1903.mostvaluableperson.controller;
 
-import com.codetest.mostvaluableperson.model.Player;
-import com.codetest.mostvaluableperson.service.TournamentService;
+import ua.andrew1903.mostvaluableperson.model.Player;
+import ua.andrew1903.mostvaluableperson.service.TournamentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

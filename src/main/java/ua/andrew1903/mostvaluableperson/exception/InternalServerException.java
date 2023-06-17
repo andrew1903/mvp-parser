@@ -1,4 +1,4 @@
-package com.codetest.mostvaluableperson.exception;
+package ua.andrew1903.mostvaluableperson.exception;
 
 import lombok.experimental.StandardException;
 import org.springframework.http.HttpStatus;
