@@ -25,12 +25,13 @@ public class TournamentServiceTest {
     private TournamentService service;
 
     @Test
-    public void successfulTest() throws IOException {
-        var files = new MultipartFile[]{file("/basketball.csv"), file("/handball.csv")};
+    public void successfulTest() {
+        var files = getFiles("basketball.csv", "handball.csv");
         assertThat(service.parse(files)).isEqualTo(Map.entry("nick3", 54));
     }
 
     @Test
+    @SuppressWarnings("ConstantConditions")
     public void successfulBatchTest() throws URISyntaxException {
         var files = Arrays.stream(new File(getClass().getResource("/batch").toURI().getPath()).listFiles())
                 .map(file -> {
@@ -44,8 +45,8 @@ public class TournamentServiceTest {
     }
 
     @Test
-    public void noMVPFound() throws IOException {
-        var files = new MultipartFile[]{file("/without_mvp.csv")};
+    public void noMVPFound() {
+        var files = getFiles("without_mvp.csv");
         assertThatThrownBy(() -> service.parse(files))
                 .isInstanceOf(InternalServerException.class)
                 .hasMessage("No mvp found!");
@@ -59,15 +60,15 @@ public class TournamentServiceTest {
     }
 
     @Test
-    public void emptyParserTest() throws IOException {
-        var files = new MultipartFile[]{file("/unknown.csv")};
+    public void emptyParserTest() {
+        var files = getFiles("unknown.csv");
         assertThatThrownBy(() -> service.parse(files))
                 .isInstanceOf(InternalServerException.class)
                 .hasMessage("Parser for  not found");
     }
 
     @Test
-    public void emptyFileTest() throws IOException {
+    public void emptyFileTest() {
         var files = new MultipartFile[]{new MockMultipartFile(" ", new byte[0])};
         assertThatThrownBy(() -> service.parse(files))
                 .isInstanceOf(InternalServerException.class)
@@ -75,8 +76,8 @@ public class TournamentServiceTest {
     }
 
     @Test
-    public void parserNotFoundTest() throws IOException {
-        var files = new MultipartFile[]{file("/volleyball.csv")};
+    public void parserNotFoundTest() {
+        var files = getFiles("volleyball.csv");
         assertThatThrownBy(() -> service.parse(files))
                 .isInstanceOf(InternalServerException.class)
                 .hasMessageStartingWith("Parser for")
@@ -84,21 +85,20 @@ public class TournamentServiceTest {
     }
 
     @Test
-    public void invalidDataTest() throws IOException {
-        var files = new MultipartFile[]{file("/basketball_invalid.csv")};
+    public void invalidDataTest() {
+        var files = getFiles("basketball_invalid.csv");
         assertThatThrownBy(() -> service.parse(files))
                 .isInstanceOf(ParseException.class)
                 .hasMessageContaining("does not match pattern");
     }
 
-    private MultipartFile file(String name) throws IOException {
-        var in = getClass().getResourceAsStream(name);
-
-        if (in == null) {
-            throw new IOException(String.format("File not found at path \"%s\"", name));
-        }
-
-        return new MockMultipartFile(name, in.readAllBytes());
+    private MultipartFile[] getFiles(String ...names) {
+        return Arrays.stream(names).map(name -> {
+            try {
+                return new MockMultipartFile(name, getClass().getResourceAsStream("/" + name));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).toArray(MultipartFile[]::new);
     }
-
 }
