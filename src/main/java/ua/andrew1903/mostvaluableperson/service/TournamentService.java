@@ -6,6 +6,6 @@ import java.util.Map;
 
 public interface TournamentService {
 
-    Map.Entry<String, Integer> parse(MultipartFile[] files);
+    Map<String, Object> parse(MultipartFile[] files);
 
 }

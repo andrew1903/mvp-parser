@@ -11,10 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.*;
 
@@ -29,17 +26,32 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Map.Entry<String, Integer> parse(MultipartFile[] files) {
+    public Map<String, Object> parse(MultipartFile[] files) {
 
-        return Arrays.stream(files)
+        var players = Arrays.stream(files)
                 .flatMap(file -> parse(file).stream())
-                .collect(groupingBy(Player::getNickname, summingInt(Player::getScore)))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue()).orElseThrow(() -> new InternalServerException("No mvp found!"));
+                .collect(groupingBy(Player::getNickname));
+
+        var playerScores = players.entrySet().stream()
+                .collect(toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().stream().mapToInt(Player::getScore).sum()
+                ));
+
+        int mvpValue = playerScores.values().stream()
+                .max(Integer::compare)
+                .orElseThrow(() -> new InternalServerException("No mvp found!"));
+
+        return Map.of(
+                "mvpScore", mvpValue,
+                "players", playerScores.entrySet().stream()
+                        .filter(entry -> entry.getValue() == mvpValue)
+                        .collect(toMap(Map.Entry::getKey, entry -> players.get(entry.getKey())))
+        );
     }
 
     private List<Player> parse(MultipartFile file) {
-        try(var reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+        try (var reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             var players = new ArrayList<Player>();
             var line = reader.readLine();
             var parser = parsers.get(line.toUpperCase());

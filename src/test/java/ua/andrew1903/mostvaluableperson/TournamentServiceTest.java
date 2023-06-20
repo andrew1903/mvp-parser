@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -27,7 +26,7 @@ public class TournamentServiceTest {
     @Test
     public void successfulTest() {
         var files = getFiles("basketball.csv", "handball.csv");
-        assertThat(service.parse(files)).isEqualTo(Map.entry("nick3", 54));
+        assertThat(service.parse(files)).hasEntrySatisfying("mvpScore", score -> assertThat(score).isEqualTo(54));
     }
 
     @Test
@@ -41,7 +40,7 @@ public class TournamentServiceTest {
                         throw new RuntimeException(e);
                     }
                 }).toArray(MultipartFile[]::new);
-        assertThat(service.parse(files)).isEqualTo(Map.entry("nick3", 324));
+        assertThat(service.parse(files)).hasEntrySatisfying("mvpScore", score -> assertThat(score).isEqualTo(324));
     }
 
     @Test
