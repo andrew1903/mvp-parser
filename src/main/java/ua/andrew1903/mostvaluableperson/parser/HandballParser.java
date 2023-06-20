@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class HandballParser implements Parser<HandballPlayer> {
+public class HandballParser implements Parser {
     @Override
     public HandballPlayer parse(Matcher matcher) {
         return HandballPlayer.builder()

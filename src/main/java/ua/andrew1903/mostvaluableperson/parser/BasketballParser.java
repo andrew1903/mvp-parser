@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-public class BasketballParser implements Parser<BasketballPlayer> {
+public class BasketballParser implements Parser {
     @Override
     public BasketballPlayer parse(Matcher matcher) {
         return BasketballPlayer.builder()

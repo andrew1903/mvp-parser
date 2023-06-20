@@ -1,16 +1,35 @@
 package ua.andrew1903.mostvaluableperson.model;
 
-public interface Player extends Comparable<Player> {
+public interface Player {
     /**
-     * @return Player's score
+     * Player's nickname. Should be unique.
+     */
+    String getNickname();
+
+    /**
+     * Player's score.
      */
     int getScore();
 
-    default int compareTo(Player o) {
-        if (!getClass().equals(o.getClass())) {
-            throw new UnsupportedOperationException("Cannot compare players of different games");
-        }
+    /**
+     * Player's team. Must not be null.
+     */
+    String getTeam();
 
-        return Integer.compare(getScore(), o.getScore());
+    /**
+     * States whether the player is a winner.
+     */
+    boolean isWinner();
+
+    /**
+     * States whether the player is a winner.
+     */
+    void setWinner(boolean winner);
+
+    /**
+     * States whether the player is a winner.
+     */
+    default void setWinner(String team) {
+        setWinner(getTeam().equals(team));
     }
 }

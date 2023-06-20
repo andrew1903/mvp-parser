@@ -13,32 +13,34 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Service
 public class TournamentServiceImpl implements TournamentService {
 
-    private final Map<String, Parser<?>> parsers;
+    private final Map<String, Parser> parsers;
 
     public TournamentServiceImpl(ApplicationContext context) {
         parsers = context.getBeansOfType(Parser.class).values().stream()
-                .collect(HashMap::new, (map, parser) -> map.put(parser.getName().toUpperCase(), parser), (map1, map2) -> {});
+                .collect(toMap(Parser::getName, parser -> parser));
     }
 
     @Override
-    public Map<String, Player> parse(MultipartFile[] files) {
+    public Map.Entry<String, Integer> parse(MultipartFile[] files) {
+
         return Arrays.stream(files)
-                .flatMap(file -> parse(file).entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .flatMap(file -> parse(file).stream())
+                .collect(groupingBy(Player::getNickname, summingInt(Player::getScore)))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue()).orElseThrow(() -> new InternalServerException("No mvp found!"));
     }
 
-    @Override
-    public Map<String, Player> parse(MultipartFile file) {
+    private List<Player> parse(MultipartFile file) {
         try(var reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             var players = new ArrayList<Player>();
-
             var line = reader.readLine();
             var parser = parsers.get(line.toUpperCase());
 
@@ -58,10 +60,12 @@ public class TournamentServiceImpl implements TournamentService {
                 players.add(parser.parse(matcher));
             }
 
-            return players.stream().max(Player::compareTo)
-                    .map(player -> Map.of(parser.getName(), player))
-                    .orElseThrow(() -> new InternalServerException("No players found in " + file.getOriginalFilename()));
-        } catch (IOException ex) {
+            var winner = parser.determineWinner(players);
+
+            players.forEach(player -> player.setWinner(winner));
+
+            return players;
+        } catch (IOException | NullPointerException ex) {
             throw new InternalServerException("Error reading file " + file.getOriginalFilename(), ex);
         }
     }

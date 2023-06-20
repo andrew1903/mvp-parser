@@ -1,6 +1,5 @@
 package ua.andrew1903.mostvaluableperson.controller;
 
-import ua.andrew1903.mostvaluableperson.model.Player;
 import ua.andrew1903.mostvaluableperson.service.TournamentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,12 +17,7 @@ public class TournamentController {
     private final TournamentService service;
 
     @PostMapping("/upload-files")
-    public Map<String, Player> upload(@RequestParam("files") MultipartFile[] files) {
+    public Map.Entry<String, Integer> upload(@RequestParam("files") MultipartFile[] files) {
         return service.parse(files);
-    }
-
-    @PostMapping("/upload-file")
-    public Map<String, Player> upload(@RequestParam("file") MultipartFile file) {
-        return service.parse(file);
     }
 }
